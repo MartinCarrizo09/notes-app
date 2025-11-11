@@ -1,160 +1,32 @@
-# Data Model# Data Model# Data Model (ER Diagram)# Data Model (ER Diagram)# 🗃️ Data Model (ER Diagram)
-
-
+﻿# Data Model
 
 ```mermaid
-
 erDiagram
-
-    USER ||--o{ NOTE : owns```mermaid
-
+    USER ||--o{ NOTE : owns
     NOTE ||--o{ TAG : has
 
-erDiagram
-
     USER {
-
-        int id PK    USER ||--o{ NOTE : owns```mermaid
-
+        int id PK
         string username
-
-        string password    NOTE ||--o{ TAG : has
-
+        string password
     }
 
-erDiagram
-
     NOTE {
-
-        int id PK    USER {
-
+        int id PK
         string title
-
-        string content        int id PK    USER ||--o{ NOTE : owns```mermaid```mermaid
-
+        string content
         boolean archived
-
-        datetime created_at        string username
-
+        datetime created_at
     }
 
-        string password    NOTE ||--o{ TAG : has
-
     TAG {
-
-        int id PK    }
-
+        int id PK
         string name
-
-    }erDiagramerDiagram
-
+    }
 ```
-
-    NOTE {
 
 ## Description
 
-        int id PK    USER {
-
 - A User can own multiple Notes.
-
-- Each Note can have multiple Tags (many-to-many relation).        string title
-
+- Each Note can have multiple Tags (many-to-many relation).
 - Notes can be marked as archived or active.
-
-        string content        int id PK    USER ||--o{ NOTE : owns    USER ||--o{ NOTE : owns
-
-        boolean archived
-
-        datetime created_at        string username
-
-    }
-
-        string password    NOTE ||--o{ TAG : has    NOTE ||--o{ TAG : has
-
-    TAG {
-
-        int id PK    }
-
-        string name
-
-    }
-
-```
-
-    NOTE {
-
-## Description
-
-        int id PK    USER {    USER {
-
-- A User can own multiple Notes.
-
-- Each Note can have multiple Tags (many-to-many relation).        string title
-
-- Notes can be marked as archived or active.
-
-        string content        int id PK        int id PK
-
-        boolean archived
-
-        datetime created_at        string username        string username
-
-    }
-
-        string password        string password
-
-    TAG {
-
-        int id PK    }    }
-
-        string name
-
-    }
-
-```
-
-    NOTE {    NOTE {
-
-## Description
-
-        int id PK        int id PK
-
-- A User can own multiple Notes.
-
-- Each Note can have multiple Tags (many-to-many relation).        string title        string title
-
-- Notes can be marked as archived or active.
-
-        string content        string content
-
-        boolean archived        boolean archived
-
-        datetime created_at        datetime created_at
-
-    }    }
-
-
-
-    TAG {    TAG {
-
-        int id PK        int id PK
-
-        string name        string name
-
-    }    }
-
-``````
-
-
-
-## Description## Description
-
-
-
-- A User can own multiple Notes.- A User can own multiple Notes.
-
-- Each Note can have multiple Tags (many-to-many relation).- Each Note can have multiple Tags (many-to-many relation).
-
-- Notes can be marked as archived or active.- Notes can be marked as archived or active.
-
