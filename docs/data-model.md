@@ -1,4 +1,4 @@
-# Data Model (ER Diagram)# Data Model (ER Diagram)# 🗃️ Data Model (ER Diagram)
+# Data Model# Data Model (ER Diagram)# Data Model (ER Diagram)# 🗃️ Data Model (ER Diagram)
 
 
 
@@ -6,29 +6,61 @@
 
 erDiagram
 
-    USER ||--o{ NOTE : owns```mermaid```mermaid
+    USER ||--o{ NOTE : owns```mermaid
 
     NOTE ||--o{ TAG : has
 
-erDiagramerDiagram
+erDiagram
 
     USER {
 
-        int id PK    USER ||--o{ NOTE : owns    USER ||--o{ NOTE : owns
+        int id PK    USER ||--o{ NOTE : owns```mermaid```mermaid
 
         string username
 
-        string password    NOTE ||--o{ TAG : has    NOTE ||--o{ TAG : has
+        string password    NOTE ||--o{ TAG : has
 
     }
 
-
+erDiagramerDiagram
 
     NOTE {
 
-        int id PK    USER {    USER {
+        int id PK    USER {
 
         string title
+
+        string content        int id PK    USER ||--o{ NOTE : owns    USER ||--o{ NOTE : owns
+
+        boolean archived
+
+        datetime created_at        string username
+
+    }
+
+        string password    NOTE ||--o{ TAG : has    NOTE ||--o{ TAG : has
+
+    TAG {
+
+        int id PK    }
+
+        string name
+
+    }
+
+```
+
+    NOTE {
+
+## Description
+
+        int id PK    USER {    USER {
+
+- A User can own multiple Notes.
+
+- Each Note can have multiple Tags (many-to-many relation).        string title
+
+- Notes can be marked as archived or active.
 
         string content        int id PK        int id PK
 
