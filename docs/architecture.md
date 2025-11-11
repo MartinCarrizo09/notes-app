@@ -13,7 +13,7 @@ flowchart LR
     D --> G[Logback + Correlation ID]
   end
 
-  B -->|REST API (JSON)| C
+  B -->|REST API JSON| C
 ```
 
 ## Description
