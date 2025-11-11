@@ -3,13 +3,16 @@ package com.ensolvers.notes.repository;
 import com.ensolvers.notes.model.Note;
 import com.ensolvers.notes.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 
-@Repository
+/**
+ * Repository for accessing and managing Note entities.
+ */
 public interface NoteRepository extends JpaRepository<Note, Long> {
-    List<Note> findByUserAndArchivedFalse(User user);
-    List<Note> findByUserAndArchivedTrue(User user);
+
+    // Find all notes belonging to a specific user
     List<Note> findByUser(User user);
+
+    // Find notes by user and archive state
+    List<Note> findByUserAndArchived(User user, boolean archived);
 }
