@@ -1,22 +1,22 @@
 package com.ensolvers.notes.controller;
 
 import com.ensolvers.notes.config.jwt.JwtUtil;
+import com.ensolvers.notes.dto.AuthRequest;
+import com.ensolvers.notes.dto.AuthResponse;
 import com.ensolvers.notes.model.User;
 import com.ensolvers.notes.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
 /**
- * Handles authentication-related REST endpoints.
+ * Handles user registration and login endpoints.
  */
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "*")
 public class AuthController {
 
     private final UserService userService;
@@ -31,54 +31,22 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody Map<String, String> payload) {
-        try {
-            String username = payload.get("username");
-            String password = payload.get("password");
-
-            if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
-                Map<String, String> error = new HashMap<>();
-                error.put("error", "Username and password are required");
-                return ResponseEntity.badRequest().body(error);
-            }
-
-            User user = userService.registerUser(username, password);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("id", user.getId());
-            response.put("username", user.getUsername());
-            response.put("message", "User registered successfully");
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", e.getMessage());
-            return ResponseEntity.badRequest().body(error);
-        }
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody AuthRequest request) {
+        User user = userService.registerUser(request.getUsername(), request.getPassword());
+        String token = jwtUtil.generateToken(user.getUsername());
+        return ResponseEntity.ok(
+                new AuthResponse(token, "User registered successfully")
+        );
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody Map<String, String> payload) {
-        try {
-            String username = payload.get("username");
-            String password = payload.get("password");
-
-            if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Username and password are required"));
-            }
-
-            Optional<User> userOpt = userService.findByUsername(username);
-            if (userOpt.isEmpty() || !passwordEncoder.matches(password, userOpt.get().getPassword())) {
-                return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"));
-            }
-
-            String token = jwtUtil.generateToken(username);
-            return ResponseEntity.ok(Map.of(
-                    "token", token,
-                    "username", userOpt.get().getUsername()
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
+        return userService.findByUsername(request.getUsername())
+                .filter(u -> passwordEncoder.matches(request.getPassword(), u.getPassword()))
+                .map(u -> ResponseEntity.ok(
+                        new AuthResponse(jwtUtil.generateToken(u.getUsername()), "Login successful")
+                ))
+                .orElse(ResponseEntity.status(401)
+                        .body(new AuthResponse(null, "Invalid username or password")));
     }
 }
