@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Handles CRUD operations for tags.
@@ -25,11 +26,21 @@ public class TagService {
     }
 
     public Tag createTag(String name) {
-        return tagRepository.findByName(name)
-                .orElseGet(() -> tagRepository.save(new Tag(null, name, null)));
+        String tagName = Objects.requireNonNull(name, "Tag name is required");
+        Tag existing = tagRepository.findByName(tagName).orElse(null);
+        if (existing != null) {
+            return existing;
+        }
+        Tag newTag = Tag.builder().name(tagName).build();
+        Tag persisted = tagRepository.save(Objects.requireNonNull(newTag));
+        return persisted;
     }
 
     public void deleteTag(Long id) {
-        tagRepository.deleteById(id);
+        Long tagId = Objects.requireNonNull(id, "Tag id is required");
+        if (!tagRepository.existsById(tagId)) {
+            throw new IllegalArgumentException("Tag not found");
+        }
+        tagRepository.deleteById(tagId);
     }
 }

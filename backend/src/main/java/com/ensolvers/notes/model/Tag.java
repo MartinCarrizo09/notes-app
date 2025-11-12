@@ -1,5 +1,6 @@
 package com.ensolvers.notes.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,5 +26,6 @@ public class Tag {
     // Many-to-many relation with notes
     @ManyToMany(mappedBy = "tags")
     @Builder.Default
+    @JsonIgnore
     private Set<Note> notes = new HashSet<>();
 }

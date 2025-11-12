@@ -45,9 +45,7 @@ To start the application, run:
 ```
 
 This script will:
-- Create or migrate the database schema
-- Run the Spring Boot backend
-- Start the React frontend
+- Run the Spring Boot backend with Swagger UI enabled on `http://localhost:8080/swagger-ui.html`
 
 Manual run:
 
@@ -59,14 +57,17 @@ cd backend && mvn spring-boot:run
 cd frontend && npm install && npm run dev
 ```
 
-## Authentication
+## API Documentation
 
-Login with:
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
+- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
 
-```
-username: admin
-password: admin123
-```
+## 🔑 Example Credentials
+
+- `username`: `admin`
+- `password`: `admin123`
+- Sample JWT (1h validity, issued with `test-secret-key-for-testing-purposes-only`):  
+  `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc2Mjk1MDk1OCwiZXhwIjoxNzYyOTU0NTU4fQ.2xyvxfoz2KjyId_FH4ysTYg8jVsGMZ7HcVsRREOpx4I`
 
 ## Logging Example
 
