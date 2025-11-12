@@ -86,6 +86,27 @@ public class NoteController {
         }
     }
 
+    @PutMapping("/{noteId}")
+    public ResponseEntity<?> updateNote(@RequestHeader("Authorization") String token,
+                                      @PathVariable Long noteId,
+                                      @RequestBody Map<String, Object> payload) {
+        try {
+            String actualToken = token.replace("Bearer ", "");
+            User user = getAuthenticatedUser(actualToken);
+
+            String title = (String) payload.get("title");
+            String content = (String) payload.get("content");
+            List<String> tagNames = (List<String>) payload.get("tags");
+
+            Note note = noteService.updateNote(noteId, user, title, content, tagNames);
+            return ResponseEntity.ok(note);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
+
     @PutMapping("/{noteId}/archive")
     public ResponseEntity<?> toggleArchiveStatus(@RequestHeader("Authorization") String token,
                                                  @PathVariable Long noteId) {

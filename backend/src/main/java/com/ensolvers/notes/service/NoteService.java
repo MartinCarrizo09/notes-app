@@ -64,6 +64,29 @@ public class NoteService {
         return noteRepository.save(note);
     }
 
+    public Note updateNote(Long noteId, User user, String title, String content, List<String> tagNames) {
+        Note note = noteRepository.findById(noteId)
+                .orElseThrow(() -> new RuntimeException("Note not found"));
+        if (!note.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized");
+        }
+        
+        note.setTitle(title);
+        note.setContent(content);
+        
+        Set<Tag> tags = new HashSet<>();
+        if (tagNames != null) {
+            for (String tagName : tagNames) {
+                Tag tag = tagRepository.findByName(tagName)
+                        .orElseGet(() -> tagRepository.save(new Tag(null, tagName, new HashSet<>())));
+                tags.add(tag);
+            }
+        }
+        note.setTags(tags);
+        
+        return noteRepository.save(note);
+    }
+
     public void deleteNoteById(Long noteId, User user) {
         Note note = noteRepository.findById(noteId)
                 .orElseThrow(() -> new RuntimeException("Note not found"));
