@@ -3,6 +3,7 @@ package com.ensolvers.notes.service;
 import com.ensolvers.notes.model.Tag;
 import com.ensolvers.notes.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,6 +42,10 @@ public class TagService {
         if (!tagRepository.existsById(tagId)) {
             throw new IllegalArgumentException("Tag not found");
         }
-        tagRepository.deleteById(tagId);
+        try {
+            tagRepository.deleteById(tagId);
+        } catch (DataIntegrityViolationException e) {
+            throw new RuntimeException("No se puede borrar el tag ya que tiene notas asociadas");
+        }
     }
 }

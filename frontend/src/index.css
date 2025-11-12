@@ -445,6 +445,25 @@ body {
   margin-bottom: 1rem;
 }
 
+.tag-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.tag-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
 .tag {
   background: #e7eaf6;
   color: #667eea;
@@ -452,6 +471,263 @@ body {
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 500;
+}
+
+/* Filter Section */
+.filter-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.filter-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.filter-controls label {
+  font-weight: 600;
+  color: #4a5568;
+  white-space: nowrap;
+}
+
+.tag-filter-select {
+  flex: 1;
+  max-width: 300px;
+  padding: 0.75rem;
+  border: 2px solid #e1e8ed;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.tag-filter-select:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+/* Tags Selector */
+.tags-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Selected Tags Container */
+.selected-tags-container {
+  background: linear-gradient(135deg, #f0f4ff 0%, #f8f9ff 100%);
+  border: 2px solid #e1e8ed;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.selected-tags-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #667eea;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.selected-tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.selected-tag-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.5rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
+  transition: all 0.2s;
+  animation: tagSlideIn 0.3s ease;
+}
+
+@keyframes tagSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.selected-tag-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35);
+}
+
+.selected-tag-icon {
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.selected-tag-name {
+  flex: 1;
+}
+
+.selected-tag-remove {
+  background: rgba(255, 255, 255, 0.25);
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  padding: 0;
+  line-height: 1;
+  margin-left: 0.25rem;
+}
+
+.selected-tag-remove:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: rotate(90deg) scale(1.1);
+}
+
+.tags-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #f8f9ff;
+  border-radius: 10px;
+  border: 2px solid #e1e8ed;
+  min-height: 60px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.tag-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  padding: 0.65rem 1rem;
+  background: white;
+  border-radius: 8px;
+  border: 2px solid #e1e8ed;
+  transition: all 0.2s;
+  user-select: none;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.tag-checkbox:hover {
+  border-color: #667eea;
+  background: #f0f4ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.15);
+}
+
+.tag-checkbox.tag-checked {
+  background: linear-gradient(135deg, #f0f4ff 0%, #e8edff 100%);
+  border-color: #667eea;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+.tag-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #667eea;
+  flex-shrink: 0;
+}
+
+.tag-checkbox-label {
+  font-size: 0.9rem;
+  color: #4a5568;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.tag-checkbox input[type="checkbox"]:checked ~ .tag-checkbox-label {
+  color: #667eea;
+  font-weight: 600;
+}
+
+.tag-delete-btn {
+  background: transparent;
+  border: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  opacity: 0.5;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+}
+
+.tag-delete-btn:hover {
+  opacity: 1;
+  background: rgba(231, 76, 60, 0.1);
+  transform: scale(1.1);
+}
+
+.tag-checkbox.tag-checked .tag-delete-btn {
+  opacity: 0.7;
+}
+
+.new-tag-input {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.new-tag-input input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid #e1e8ed;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color 0.3s;
+}
+
+.new-tag-input input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.btn-tag-add {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s;
+  white-space: nowrap;
+}
+
+.btn-tag-add:hover {
+  background: #5568d3;
 }
 
 .note-card-header {
@@ -855,6 +1131,45 @@ body {
 
   .form-row {
     grid-template-columns: 1fr;
+  }
+
+  .filter-section {
+    padding: 1rem;
+  }
+
+  .filter-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .tag-filter-select {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .tags-checkboxes {
+    max-height: 150px;
+    padding: 0.75rem;
+  }
+
+  .selected-tags-container {
+    padding: 0.75rem;
+  }
+
+  .selected-tag-item {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.7rem;
+  }
+
+  .tag-checkbox {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .tag-delete-btn {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.4rem;
   }
 
   .notes-header {

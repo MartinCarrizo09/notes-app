@@ -3,6 +3,7 @@ import api from "../services/api";
 
 function NotesPage() {
   const [notes, setNotes] = useState([]);
+  const [allNotes, setAllNotes] = useState([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
@@ -11,16 +12,81 @@ function NotesPage() {
   const [editContent, setEditContent] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [tags, setTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [editSelectedTags, setEditSelectedTags] = useState([]);
+  const [newTagName, setNewTagName] = useState("");
+  const [editNewTagName, setEditNewTagName] = useState("");
+  const [filterTagId, setFilterTagId] = useState(null);
 
   const fetchNotes = async () => {
     try {
       setError("");
       const res = await api.get("/notes/active");
-      setNotes(res.data);
+      setAllNotes(res.data);
+      applyFilter(res.data);
     } catch (err) {
       const errorMsg = err.response?.data?.error || err.message || "Failed to load notes";
       setError(errorMsg);
       console.error("Error fetching notes:", err);
+    }
+  };
+
+  const fetchTags = async () => {
+    try {
+      const res = await api.get("/tags");
+      setTags(res.data);
+    } catch (err) {
+      console.error("Error fetching tags:", err);
+    }
+  };
+
+  const applyFilter = (notesToFilter) => {
+    if (filterTagId === null) {
+      setNotes(notesToFilter);
+    } else {
+      const filtered = notesToFilter.filter(note => 
+        note.tags && note.tags.some(tag => tag.id === filterTagId)
+      );
+      setNotes(filtered);
+    }
+  };
+
+  const createTag = async (tagName, addToSelection = true, isEditMode = false) => {
+    if (!tagName.trim()) return null;
+    try {
+      const res = await api.post("/tags", { name: tagName.trim() });
+      await fetchTags();
+      // Agregar automáticamente el nuevo tag a la selección correspondiente
+      const newTag = res.data;
+      if (newTag && newTag.id && addToSelection) {
+        if (isEditMode) {
+          setEditSelectedTags([...editSelectedTags, newTag.id]);
+        } else {
+          setSelectedTags([...selectedTags, newTag.id]);
+        }
+      }
+      return newTag;
+    } catch (err) {
+      console.error("Error creating tag:", err);
+      return null;
+    }
+  };
+
+  const deleteTag = async (tagId) => {
+    if (!confirm("¿Estás seguro de que quieres eliminar este tag? Se eliminará de todas las notas.")) return;
+    try {
+      await api.delete(`/tags/${tagId}`);
+      await fetchTags();
+      // Remover el tag de las selecciones si estaba seleccionado
+      setSelectedTags(selectedTags.filter(id => id !== tagId));
+      setEditSelectedTags(editSelectedTags.filter(id => id !== tagId));
+      setSuccess("Tag eliminado correctamente");
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err) {
+      const errorMsg = err.response?.data?.error || err.message || "Failed to delete tag";
+      setError(errorMsg);
+      console.error("Error deleting tag:", err);
     }
   };
 
@@ -31,9 +97,26 @@ function NotesPage() {
     setError("");
     setSuccess("");
     try {
-      await api.post("/notes/create", { title, content, tags: [] });
+      const tagNames = selectedTags.map(tagId => {
+        const tag = tags.find(t => t.id === tagId);
+        return tag ? tag.name : null;
+      }).filter(Boolean);
+
+      // Crear nuevo tag si se ingresó uno (ya se agregó a selectedTags en createTag)
+      if (newTagName.trim()) {
+        const newTag = await createTag(newTagName, true, false);
+        if (newTag) {
+          // El tag ya está en selectedTags, solo agregamos el nombre
+          tagNames.push(newTag.name);
+        }
+        setNewTagName("");
+      }
+
+      await api.post("/notes/create", { title, content, tags: tagNames });
       setTitle("");
       setContent("");
+      setSelectedTags([]);
+      setNewTagName("");
       setSuccess("Note created successfully!");
       fetchNotes();
       setTimeout(() => setSuccess(""), 3000);
@@ -80,12 +163,18 @@ function NotesPage() {
     setEditingNote(note.id);
     setEditTitle(note.title);
     setEditContent(note.content);
+    // Cargar tags de la nota
+    const noteTagIds = note.tags ? note.tags.map(tag => tag.id) : [];
+    setEditSelectedTags(noteTagIds);
+    setEditNewTagName("");
   };
 
   const cancelEdit = () => {
     setEditingNote(null);
     setEditTitle("");
     setEditContent("");
+    setEditSelectedTags([]);
+    setEditNewTagName("");
   };
 
   const saveEdit = async () => {
@@ -95,10 +184,25 @@ function NotesPage() {
     setError("");
     setSuccess("");
     try {
+      const tagNames = editSelectedTags.map(tagId => {
+        const tag = tags.find(t => t.id === tagId);
+        return tag ? tag.name : null;
+      }).filter(Boolean);
+
+      // Crear nuevo tag si se ingresó uno (ya se agregó a editSelectedTags en createTag)
+      if (editNewTagName.trim()) {
+        const newTag = await createTag(editNewTagName, true, true);
+        if (newTag) {
+          // El tag ya está en editSelectedTags, solo agregamos el nombre
+          tagNames.push(newTag.name);
+        }
+        setEditNewTagName("");
+      }
+
       await api.put(`/notes/${editingNote}`, {
         title: editTitle,
         content: editContent,
-        tags: []
+        tags: tagNames
       });
       setSuccess("Note updated successfully!");
       cancelEdit();
@@ -115,7 +219,12 @@ function NotesPage() {
 
   useEffect(() => {
     fetchNotes();
+    fetchTags();
   }, []);
+
+  useEffect(() => {
+    applyFilter(allNotes);
+  }, [filterTagId, allNotes]);
 
   return (
     <div className="notes-container">
@@ -128,6 +237,23 @@ function NotesPage() {
         </div>
         <span className="notes-hint">Keep ideas organized and archive what you're done with.</span>
       </header>
+
+      <section className="filter-section">
+        <div className="filter-controls">
+          <label htmlFor="tag-filter">Filter by Tag:</label>
+          <select
+            id="tag-filter"
+            value={filterTagId || ""}
+            onChange={(e) => setFilterTagId(e.target.value ? parseInt(e.target.value) : null)}
+            className="tag-filter-select"
+          >
+            <option value="">All Notes</option>
+            {tags.map(tag => (
+              <option key={tag.id} value={tag.id}>{tag.name}</option>
+            ))}
+          </select>
+        </div>
+      </section>
 
       {error && (
         <div className="alert alert-error" onClick={() => setError("")}>
@@ -171,6 +297,73 @@ function NotesPage() {
             />
           </div>
         </div>
+        <div className="form-group">
+          <label htmlFor="note-tags">Tags</label>
+          <div className="tags-selector">
+            <div className="tags-checkboxes">
+              {tags.map(tag => (
+                <label 
+                  key={tag.id} 
+                  className={`tag-checkbox ${selectedTags.includes(tag.id) ? 'tag-checked' : ''}`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedTags.includes(tag.id)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedTags([...selectedTags, tag.id]);
+                      } else {
+                        setSelectedTags(selectedTags.filter(id => id !== tag.id));
+                      }
+                    }}
+                  />
+                  <span className="tag-checkbox-label">{tag.name}</span>
+                  <button
+                    type="button"
+                    className="tag-delete-btn"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      deleteTag(tag.id);
+                    }}
+                    title="Eliminar tag"
+                  >
+                    🗑️
+                  </button>
+                </label>
+              ))}
+            </div>
+            <div className="new-tag-input">
+              <input
+                type="text"
+                placeholder="Create new tag..."
+                value={newTagName}
+                onChange={(e) => setNewTagName(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (newTagName.trim()) {
+                      createTag(newTagName, true, false);
+                      setNewTagName("");
+                    }
+                  }
+                }}
+              />
+              {newTagName.trim() && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    createTag(newTagName, true, false);
+                    setNewTagName("");
+                  }}
+                  className="btn-tag-add"
+                >
+                  Add Tag
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
         <div className="form-actions">
           <button
             onClick={createNote}
@@ -197,6 +390,13 @@ function NotesPage() {
                 </span>
               </header>
               <p className="note-content">{note.content}</p>
+              {note.tags && note.tags.length > 0 && (
+                <div className="note-tags">
+                  {note.tags.map(tag => (
+                    <span key={tag.id} className="tag-badge">{tag.name}</span>
+                  ))}
+                </div>
+              )}
               <footer className="note-actions">
                 <button
                   onClick={() => startEdit(note)}
@@ -247,6 +447,73 @@ function NotesPage() {
                   onChange={(e) => setEditContent(e.target.value)}
                   rows="6"
                 />
+              </div>
+              <div className="form-group">
+                <label htmlFor="edit-tags">Tags</label>
+                <div className="tags-selector">
+                  <div className="tags-checkboxes">
+                    {tags.map(tag => (
+                      <label 
+                        key={tag.id} 
+                        className={`tag-checkbox ${editSelectedTags.includes(tag.id) ? 'tag-checked' : ''}`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={editSelectedTags.includes(tag.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setEditSelectedTags([...editSelectedTags, tag.id]);
+                            } else {
+                              setEditSelectedTags(editSelectedTags.filter(id => id !== tag.id));
+                            }
+                          }}
+                        />
+                        <span className="tag-checkbox-label">{tag.name}</span>
+                        <button
+                          type="button"
+                          className="tag-delete-btn"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            deleteTag(tag.id);
+                          }}
+                          title="Eliminar tag"
+                        >
+                          🗑️
+                        </button>
+                      </label>
+                    ))}
+                  </div>
+                  <div className="new-tag-input">
+                    <input
+                      type="text"
+                      placeholder="Create new tag..."
+                      value={editNewTagName}
+                      onChange={(e) => setEditNewTagName(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          if (editNewTagName.trim()) {
+                            createTag(editNewTagName, true, true);
+                            setEditNewTagName("");
+                          }
+                        }
+                      }}
+                    />
+                    {editNewTagName.trim() && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          createTag(editNewTagName, true, true);
+                          setEditNewTagName("");
+                        }}
+                        className="btn-tag-add"
+                      >
+                        Add Tag
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
             <div className="modal-footer">
