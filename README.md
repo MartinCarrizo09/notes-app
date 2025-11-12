@@ -116,18 +116,12 @@ cd frontend && npm install && npm run dev
 2025-11-11 11:32:14 INFO [d2f1c97e-21e3-42b6] NoteService  User admin created note "Shopping List"
 ```
 
-## Deployment
-
-A live version of the project is available at:
-
-https://ensolvers-notes.onrender.com
-
-For detailed deployment instructions, see [DEPLOY.md](./DEPLOY.md)
-
 ## Future Improvements
 
 These are potential next steps for scalability and maintainability:
 
+- Deploy to cloud platform (Render, Railway, Heroku, etc.)
 - Replace JWT authentication with Keycloak for centralized identity management
 - Add unit tests with JUnit and integration tests with RestAssured
 - Implement Docker Compose for full local orchestration
+- Add CI/CD pipeline with GitHub Actions
