@@ -31,7 +31,9 @@ echo ""
 echo "🔧 Starting backend (Spring Boot)..."
 echo "   This may take 30-60 seconds on first run..."
 cd backend
-mvn clean spring-boot:run > ../backend.log 2>&1 &
+# Create logs directory if it doesn't exist
+mkdir -p logs
+mvn clean spring-boot:run > logs/backend.log 2>&1 &
 BACKEND_PID=$!
 cd ..
 
@@ -41,12 +43,12 @@ sleep 8
 # Check if backend started successfully
 if command -v curl > /dev/null 2>&1; then
     if ! curl -s http://localhost:8080/actuator/health > /dev/null 2>&1; then
-        echo "⏳ Backend is still starting... (check backend.log for progress)"
+        echo "⏳ Backend is still starting... (check backend/logs/backend.log for progress)"
     else
         echo "✅ Backend is running!"
     fi
 else
-    echo "⏳ Backend is starting... (check backend.log for details)"
+    echo "⏳ Backend is starting... (check backend/logs/backend.log for details)"
 fi
 
 # Start frontend

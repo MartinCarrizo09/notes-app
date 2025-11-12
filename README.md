@@ -83,7 +83,7 @@ This script will:
 **Note**: 
 - The script runs in the foreground. Press `Ctrl+C` to stop both servers.
 - On first run, Maven will download dependencies (may take 2-3 minutes).
-- Backend logs are saved to `backend.log` in the project root.
+- Backend logs are saved to `backend/logs/backend.log`.
 - Make sure PostgreSQL is running and the database `notes_db` exists before starting.
 
 ### Manual Run
@@ -121,6 +121,8 @@ cd frontend && npm install && npm run dev
 A live version of the project is available at:
 
 https://ensolvers-notes.onrender.com
+
+For detailed deployment instructions, see [DEPLOY.md](./DEPLOY.md)
 
 ## Future Improvements
 
